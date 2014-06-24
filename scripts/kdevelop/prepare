@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-prefix=/tmp
+prefix=$HOME
 src_dir=$prefix/src/kde/kdevelop
 trunk_dir=$src_dir/trunk
 mkdir -p "$trunk_dir"
@@ -52,8 +52,7 @@ EOF
 
 for product in kdevelop kdevplatform
 do
-    #clone git://anongit.kde.org/$product "$trunk_dir/$product"
-    clone git@github.com:midenok/ln-install.git "$trunk_dir/$product"
+    clone git://anongit.kde.org/$product "$trunk_dir/$product"
     build_dir="$trunk_dir/${product}.build"
     mkdir "$build_dir"
     ln -st "$build_dir" "$src_dir/cmake.sh"
