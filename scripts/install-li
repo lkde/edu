@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+prefix=$HOME
+src_dir=$prefix/src/github/ln-install
+bin_dir=$prefix/bin
+mkdir -p "$src_dir" "$bin_dir"
+echo "Cloning into $src_dir..."
+git clone -q git@github.com:midenok/ln-install.git "$src_dir"
+[ -h "$bin_dir/cmake-ln" ] &&
+    rm -f "$bin_dir/cmake-ln"
+echo -n "Installing: "
+ln -vs "$src_dir/cmake-ln" "$bin_dir/cmake-ln"
