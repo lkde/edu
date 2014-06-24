@@ -1,0 +1,78 @@
+#!/bin/sh
+set -e
+prefix=/tmp
+src_dir=$prefix/src/kde/kdevelop
+trunk_dir=$src_dir/trunk
+mkdir -p "$trunk_dir"
+
+clone()
+{
+    echo -n "Cloning into $2... "
+    git clone -q "$1" "$2"
+    echo "done!"
+}
+
+copy()
+{
+    echo -n "Copying into $2/$3... "
+    cp -at "$2" "$1"
+    echo "done!"
+}
+
+script()
+{
+    cat > "$1"
+    chmod +x "$1"
+}
+
+script "$src_dir/cmake.sh" << 'EOF'
+#!/bin/bash
+src_dir=$(readlink -ne "${@: -1}")
+opt_dir=$(readlink -f "$src_dir/../opt")
+export KDevPlatform_DIR="$opt_dir"
+
+cmake-ln \
+-D CMAKE_INSTALL_PREFIX:PATH="$opt_dir" \
+-D CMAKE_BUILD_TYPE:STRING=debugfull \
+-D CMAKE_CXX_FLAGS:STRING="-g -O0" \
+-D CMAKE_C_FLAGS:STRING="-g -O0" \
+"$@"
+EOF
+
+script "$src_dir/kdevelop.sh" << 'EOF'
+#!/bin/bash
+[[ $_ != $0 ]] && me=${BASH_SOURCE[0]} || me=$0
+me=$(readlink -f "$me")
+src_dir=$(dirname "$me")
+optdir=$src_dir/$1/opt
+export KDEDIRS=$optdir
+export KDEV_DISABLE_SPLASH=1
+$optdir/bin/kdevelop
+EOF
+
+for product in kdevelop kdevplatform
+do
+    #clone git://anongit.kde.org/$product "$trunk_dir/$product"
+    clone git@github.com:midenok/ln-install.git "$trunk_dir/$product"
+    build_dir="$trunk_dir/${product}.build"
+    mkdir "$build_dir"
+    ln -st "$build_dir" "$src_dir/cmake.sh"
+done
+
+stable_dir=$src_dir/stable
+mkdir "$stable_dir"
+
+for product in kdevelop kdevplatform
+do 
+    copy "$trunk_dir/$product" "$stable_dir" "$product"
+    build_dir="$stable_dir/${product}.build"
+    mkdir "$build_dir"
+    ln -st "$build_dir" "$src_dir/cmake.sh"
+done
+
+(
+    cd "$stable_dir/kdevelop"
+    git checkout -b stable remotes/origin/4.6
+    cd "$stable_dir/kdevplatform"
+    git checkout -b stable remotes/origin/1.6
+)
