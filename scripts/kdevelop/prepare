@@ -32,6 +32,7 @@ opt_dir=$(readlink -f "$src_dir/../opt")
 export KDevPlatform_DIR="$opt_dir"
 
 cmake-ln \
+-Wno-dev \
 -D CMAKE_INSTALL_PREFIX:PATH="$opt_dir" \
 -D CMAKE_BUILD_TYPE:STRING=debugfull \
 -D CMAKE_CXX_FLAGS:STRING="-g -O0" \
