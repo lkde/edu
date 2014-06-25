@@ -50,24 +50,37 @@ export KDEV_DISABLE_SPLASH=1
 $optdir/bin/kdevelop
 EOF
 
-for product in kdevelop kdevplatform
-do
-    clone git://anongit.kde.org/$product "$trunk_dir/$product"
-    build_dir="$trunk_dir/${product}.build"
-    mkdir "$build_dir"
-    ln -st "$build_dir" "$src_dir/cmake.sh"
-done
+sources()
+{
+    dst_dir="$1"
+    cmd="$2"
+    copy_from="$3"
+
+    for product in kdevelop kdevplatform
+    do
+        product_dir="$dst_dir/$product"
+        [ -d "$product_dir" ] ||
+            if [ "$cmd" = "clone" ]; then
+                clone git://anongit.kde.org/$product "$product_dir"
+            else
+                copy "$copy_from/$product" "$dst_dir" "$product"
+            fi
+
+        build_dir="$dst_dir/${product}.build"
+        mkdir -p "$build_dir"
+        cmake_sh="$build_dir/cmake.sh"
+        [ -h "$cmake_sh" ] &&
+            rm -f "$cmake_sh"
+        ln -s "$src_dir/cmake.sh" "$cmake_sh"
+    done
+}
+
+sources "$trunk_dir" clone
 
 stable_dir=$src_dir/stable
-mkdir "$stable_dir"
+mkdir -p "$stable_dir"
 
-for product in kdevelop kdevplatform
-do 
-    copy "$trunk_dir/$product" "$stable_dir" "$product"
-    build_dir="$stable_dir/${product}.build"
-    mkdir "$build_dir"
-    ln -st "$build_dir" "$src_dir/cmake.sh"
-done
+sources "$stable_dir" copy "$trunk_dir"
 
 (
     cd "$stable_dir/kdevelop"
