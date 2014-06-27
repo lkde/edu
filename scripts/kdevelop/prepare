@@ -46,9 +46,11 @@ script "$src_dir/kdevelop.sh" << 'EOF'
 me=$(readlink -f "$me")
 src_dir=$(dirname "$me")
 optdir=$src_dir/$1/opt
+shift
 export KDEDIRS=$optdir
 export KDEV_DISABLE_SPLASH=1
-$optdir/bin/kdevelop
+kbuildsycoca4 &> /dev/null
+$optdir/bin/kdevelop "$@"
 EOF
 
 sources()
