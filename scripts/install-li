@@ -1,12 +1,21 @@
-#!/bin/sh
-set -e
-prefix=$HOME
+#!/bin/bash
+[ "$prefix" ] ||
+    prefix=$HOME
 src_dir=$prefix/src/github/ln-install
 bin_dir=$prefix/bin
-mkdir -p "$src_dir" "$bin_dir"
-echo "Cloning into $src_dir..."
-git clone -q git@github.com:midenok/ln-install.git "$src_dir"
-[ -h "$bin_dir/cmake-ln" ] &&
-    rm -f "$bin_dir/cmake-ln"
-echo -n "Installing: "
-ln -vs "$src_dir/cmake-ln" "$bin_dir/cmake-ln"
+(
+    set -e
+    mkdir -p "$src_dir" "$bin_dir"
+    echo "Cloning into $src_dir..."
+    git clone -q git@github.com:midenok/ln-install.git "$src_dir"
+    [ -h "$bin_dir/cmake-ln" ] &&
+        rm -f "$bin_dir/cmake-ln"
+    echo "Installing into ${bin_dir}: "
+    ln -vs "$src_dir/cmake-ln" "$bin_dir/cmake-ln"
+)
+
+if [[ ":$PATH:" != *":${bin_dir}:"* ]]
+then
+    PATH=$PATH:$bin_dir
+    echo "PATH does not contain $bin_dir! It was set now for current shell." >&2
+fi
