@@ -78,6 +78,16 @@ sources()
     done
 }
 
+checkout_branch()
+{
+    if [ -f .git/refs/heads/stable ]
+    then
+        git checkout master
+        git branch -d stable
+    fi
+    git checkout -b stable remotes/origin/${1}
+}
+
 sources "$trunk_dir" clone
 
 stable_dir=$src_dir/stable
@@ -87,7 +97,7 @@ sources "$stable_dir" copy "$trunk_dir"
 
 (
     cd "$stable_dir/kdevelop"
-    git checkout -b stable remotes/origin/4.6
+    checkout_branch 4.7
     cd "$stable_dir/kdevplatform"
-    git checkout -b stable remotes/origin/1.6
+    checkout_branch 1.7
 )
