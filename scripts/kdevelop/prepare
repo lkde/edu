@@ -33,10 +33,10 @@ export KDevPlatform_DIR="$opt_dir"
 
 cmake-ln \
 -Wno-dev \
--D CMAKE_INSTALL_PREFIX:PATH="$opt_dir" \
--D CMAKE_BUILD_TYPE:STRING=debugfull \
--D CMAKE_CXX_FLAGS:STRING="-g -O0" \
--D CMAKE_C_FLAGS:STRING="-g -O0" \
+-DCMAKE_INSTALL_PREFIX:PATH="$opt_dir" \
+-DCMAKE_BUILD_TYPE:STRING=debugfull \
+-DCMAKE_CXX_FLAGS:STRING="-g -O0" \
+-DCMAKE_C_FLAGS:STRING="-g -O0" \
 "$@"
 EOF
 
@@ -97,7 +97,7 @@ sources "$stable_dir" copy "$trunk_dir"
 
 (
     cd "$stable_dir/kdevelop"
-    checkout_branch 4.7
+    checkout_branch 5.1
     cd "$stable_dir/kdevplatform"
-    checkout_branch 1.7
+    checkout_branch 5.1
 )
