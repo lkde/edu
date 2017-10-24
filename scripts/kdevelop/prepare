@@ -31,12 +31,37 @@ src_dir=$(readlink -ne "${@: -1}")
 opt_dir=$(readlink -f "$src_dir/../opt")
 export KDevPlatform_DIR="$opt_dir"
 
+unset opt_ccache
+if [ -x $(which ccache) ]
+then
+    opt_ccache="-DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache"
+fi
+
+unset opt_ninja
+if [ -x $(which ninja) ]
+then
+    opt_ninja="-GNinja"
+fi
+
+unset opt_clang
+if [ -x $(which clang) ]
+then
+    opt_clang="-DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_C_COMPILER=/usr/bin/clang"
+fi
+
+unset opt_llvm
+if [ -x $(which llvm-ar-5.0) ]
+then
+    opt_llvm="-D_CMAKE_TOOLCHAIN_PREFIX=llvm- -D_CMAKE_TOOLCHAIN_SUFFIX=-5.0"
+fi
+
 cmake-ln \
 -Wno-dev \
 -DCMAKE_INSTALL_PREFIX:PATH="$opt_dir" \
 -DCMAKE_BUILD_TYPE:STRING=debugfull \
 -DCMAKE_CXX_FLAGS:STRING="-g -O0" \
 -DCMAKE_C_FLAGS:STRING="-g -O0" \
+$opt_ccache $opt_ninja $opt_clang $opt_llvm \
 "$@"
 EOF
 
